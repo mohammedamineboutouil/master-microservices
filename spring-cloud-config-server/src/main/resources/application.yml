@@ -1,0 +1,22 @@
+server:
+  port: 8012
+spring:
+  application:
+    name: cloud-config
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:///home/mohammedamine/Documents/workspace/master-microservices/git-localconfig-repo
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: Alpha2020
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh

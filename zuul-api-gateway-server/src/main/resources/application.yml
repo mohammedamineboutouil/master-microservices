@@ -1,0 +1,50 @@
+server:
+  port: 8011
+spring:
+  application:
+    name: zuul-ws
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: Alpha2020
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8010/eureka
+authorization:
+  token:
+    header:
+      name: Authorization
+      prefix: Bearer
+api:
+  zuul:
+    actuator:
+      url:
+        path: /actuator/*
+  users:
+    actuator:
+      url:
+        path: /users-ws/actuator/*
+  login:
+    url:
+      path: /users-ws/users/login
+  registration:
+    url:
+      path: /users-ws/users
+management:
+  endpoints:
+    web:
+      exposure:
+        include: beans,health,routes,httptrace
+ribbon:
+  ReadTimeout: 60000
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+zuul:
+  sensitive-headers: Cookie,Set-Cookie
