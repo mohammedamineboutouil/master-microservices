@@ -32,6 +32,9 @@ api:
   registration:
     url:
       path: /users-ws/users
+  me:
+    url:
+      path: /users-ws/users/me
 management:
   endpoints:
     web:
