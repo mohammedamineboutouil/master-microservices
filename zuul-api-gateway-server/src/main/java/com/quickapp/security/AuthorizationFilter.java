@@ -1,6 +1,5 @@
 package com.quickapp.security;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
@@ -52,29 +52,15 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 
         String token = authorizationHeader.replace(environment.getProperty("authorization.token.header.prefix"), "");
 
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(environment.getProperty("jwt.secret"))
-                    .parseClaimsJws(token)
-                    .getBody();
+        String userId = Jwts.parser()
+                .setSigningKey(environment.getProperty("jwt.secret"))
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
 
-            String userId = claims.getSubject();
-
-            if (userId == null) {
-                return null;
-            }
-
-            String role = (String) claims.get("role");
-            
-            System.out.println(role);
-
-            List<GrantedAuthority> grantedAuths =
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(role);
-
-            return new UsernamePasswordAuthenticationToken(userId, null, grantedAuths);
-        } catch (Exception e) {
-            SecurityContextHolder.clearContext();
+        if (userId == null) {
             return null;
         }
+        return new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
     }
 }

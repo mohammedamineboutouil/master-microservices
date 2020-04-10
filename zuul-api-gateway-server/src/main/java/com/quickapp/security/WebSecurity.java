@@ -25,19 +25,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.logout().disable();
-        http.formLogin().disable();
         http.headers().frameOptions().disable();
         http.authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .antMatchers(environment.getProperty("api.zuul.actuator.url.path")).permitAll()
                 .antMatchers(environment.getProperty("api.users.actuator.url.path")).permitAll()
-                .antMatchers(HttpMethod.GET, "/employees-ws/token").hasRole("SUPER_ADMIN")
-                .antMatchers(HttpMethod.GET, environment.getProperty("api.me.url.path")).permitAll()
                 .antMatchers(HttpMethod.POST, environment.getProperty("api.login.url.path")).permitAll()
                 .antMatchers(HttpMethod.POST, environment.getProperty("api.registration.url.path")).permitAll()
                 .anyRequest().authenticated()
                 .and().addFilter(new AuthorizationFilter(authenticationManager(), environment));
+
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }
