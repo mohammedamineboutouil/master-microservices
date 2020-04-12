@@ -72,11 +72,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         BeanUtils.copyProperties(userDetails, userModel);
 
+        System.out.println(userModel.getAuthorities());
+
         String token = Jwts.builder()
                 .setSubject(userDetails.getId())
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(environment.getProperty("jwt.expiration"))))
                 .signWith(SignatureAlgorithm.HS512, environment.getProperty("jwt.secret"))
-                .claim("role", userModel.getRole())
+                .claim("authorities", userModel.getAuthorities())
                 .compact();
 
         res.setContentType("application/json");

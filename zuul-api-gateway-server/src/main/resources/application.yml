@@ -42,12 +42,15 @@ management:
         include: beans,health,routes,httptrace
 ribbon:
   ReadTimeout: 60000
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 60000
+#hystrix:
+#  command:
+#    default:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 60000
 zuul:
   sensitive-headers: Cookie,Set-Cookie
+logging:
+  file:
+    name: /home/mohammedamine/Documents/workspace/master-microservices/logs/zuul-ws.log

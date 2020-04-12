@@ -18,15 +18,15 @@ public class UserDto {
     private String email;
     private String password;
     private String encryptedPassword;
-    private Role role;
-    private List<Permission> permissions;
+    private List<Authority> authorities;
+    private boolean isActivated;
 
-    public UserDto(String firstName, String lastName, String email, String password, Role role, List<Permission> permissions) {
+    public UserDto(String firstName, String lastName, String email, String password, List<Authority> authorities, boolean isActivated) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.role = role;
-        this.permissions = permissions;
+        this.authorities = authorities;
+        this.isActivated = isActivated;
     }
 }

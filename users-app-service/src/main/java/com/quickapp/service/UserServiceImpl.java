@@ -2,10 +2,11 @@ package com.quickapp.service;
 
 import com.quickapp.data.entities.UserEntity;
 import com.quickapp.data.repositories.UserRepository;
-import com.quickapp.shared.Permission;
-import com.quickapp.shared.Role;
+import com.quickapp.shared.Authority;
 import com.quickapp.shared.UserDto;
 import io.jsonwebtoken.Jwts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -21,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final Environment environment;
     private final UserRepository userRepository;
@@ -43,13 +46,12 @@ public class UserServiceImpl implements UserService {
 
         BeanUtils.copyProperties(userDetails, storedUser);
 
-        List<Permission> costumerPermissions = new ArrayList<>();
-        costumerPermissions.add(Permission.WRITE);
-        costumerPermissions.add(Permission.READ);
+        if (storedUser.getAuthorities() == null) {
+            List<Authority> authoritiesCostumer = new ArrayList<>();
+            authoritiesCostumer.add(Authority.COSTUMER);
 
-        storedUser.setRole(Role.COSTUMER);
-
-        storedUser.setPermissions(costumerPermissions);
+            storedUser.setAuthorities(authoritiesCostumer);
+        }
 
         storedUser = userRepository.save(storedUser);
 
@@ -87,6 +89,19 @@ public class UserServiceImpl implements UserService {
                 .getBody()
                 .getSubject();
         return this.getUserByUserId(userId);
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() {
+        logger.info("Calling users service");
+        List<UserEntity> storedUsers = this.userRepository.findAll();
+        List<UserDto> returnedValue = new ArrayList<>();
+        storedUsers.forEach(user -> {
+            UserDto dto = new UserDto();
+            BeanUtils.copyProperties(user,dto);
+            returnedValue.add(dto);
+        });
+        return returnedValue;
     }
 
     @Override

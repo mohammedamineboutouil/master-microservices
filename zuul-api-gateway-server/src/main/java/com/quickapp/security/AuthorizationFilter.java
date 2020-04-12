@@ -1,11 +1,11 @@
 package com.quickapp.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -14,8 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -49,18 +49,24 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (authorizationHeader == null) {
             return null;
         }
+        try {
+            String token = authorizationHeader.replace(environment.getProperty("authorization.token.header.prefix"), "");
 
-        String token = authorizationHeader.replace(environment.getProperty("authorization.token.header.prefix"), "");
+            Claims claims = Jwts.parser()
+                    .setSigningKey(environment.getProperty("jwt.secret"))
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        String userId = Jwts.parser()
-                .setSigningKey(environment.getProperty("jwt.secret"))
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+            String userId = claims.getSubject();
 
-        if (userId == null) {
+            if (userId == null) {
+                return null;
+            }
+            List<String> authorities = claims.get("authorities", List.class);
+            return new UsernamePasswordAuthenticationToken(userId, null,  authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+
+        }catch (Exception e){
             return null;
         }
-        return new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
     }
 }

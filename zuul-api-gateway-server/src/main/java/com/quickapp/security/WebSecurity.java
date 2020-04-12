@@ -27,14 +27,15 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.headers().frameOptions().disable();
         http.authorizeRequests()
-                .antMatchers("/**").permitAll()
+//                .antMatchers("/**").permitAll()
                 .antMatchers(environment.getProperty("api.zuul.actuator.url.path")).permitAll()
                 .antMatchers(environment.getProperty("api.users.actuator.url.path")).permitAll()
                 .antMatchers(HttpMethod.POST, environment.getProperty("api.login.url.path")).permitAll()
-                .antMatchers(HttpMethod.POST, environment.getProperty("api.registration.url.path")).permitAll()
+                .antMatchers(HttpMethod.GET, "/users-ws/users/").hasAuthority("SUPER_ADMIN")
+                .antMatchers(HttpMethod.GET, "/users-ws/users/me").permitAll()
+                .antMatchers("/users-ws/users/**").hasAuthority("SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and().addFilter(new AuthorizationFilter(authenticationManager(), environment));
-
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }
