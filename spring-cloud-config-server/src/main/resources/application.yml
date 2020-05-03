@@ -9,12 +9,12 @@ spring:
     config:
       server:
         native:
-          search-locations: file:///home/mohammedamine/Documents/workspace/master-microservices/git-localconfig-repo
+          search-locations: file:///home/USER/master-microservices/git-localconfig-repo
   rabbitmq:
     host: localhost
     port: 5672
     username: guest
-    password: Alpha2020
+    password: guest
 management:
   endpoints:
     web:
